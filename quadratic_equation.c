@@ -169,19 +169,21 @@ void Test() {
 }
     
 bool Scan(double* a, double* b, double* c) {
+    assert(a);
+    assert(b);
+    assert(c);
+    
     int num_attempts = 1;
     bool success = false;
-    assert(num_attempts > 0);
-    
     while ((num_attempts <= MAX_ATTEMPTS)) {
         printf("Enter 3 real numbers a, b, c:\n");
         fflush(stdin);
         success = (scanf("%lf %lf %lf", a, b, c) == 3) && (!isinf(*a))
                 && (!isinf(*b)) && (!isinf(*c));
-        if (success)
+        if (success || num_attempts == MAX_ATTEMPTS)
             break;
         else
-        printf("Incorrect input. Attempts remaining: %d\n",
+            printf("Incorrect input. Attempts remaining: %d\n",
                MAX_ATTEMPTS - num_attempts++);
     }
     return success;
@@ -219,7 +221,9 @@ roots Quadratic(double a, double b, double c,
     assert (x1);
     assert (x2);
     assert (x1 != x2);
-    assert(!isinf(b * b) && !isinf(4 * a * c));
+    assert(!isinf(a));
+    assert(!isinf(b));
+    assert(!isinf(c));
     
     double d = b * b - 4 * a * c;
     
