@@ -7,7 +7,7 @@ int main() {
     char* buffer = NULL;
     size_t size = 0;
     FILE* input_file = NULL;
-    Check(OpenFile(input_file_path, &input_file, "r"));
+    Check(OpenFile(input_file_path, &input_file, "rt"));
     Check(ReadTextAndGetSize(input_file, &buffer, &size));
     Check(CloseFile(&input_file));
     
@@ -19,7 +19,7 @@ int main() {
     // Sort text and write to file
     const char output_file_path[] = "/Users/kseniya/Desktop/output.txt";
     FILE* output_file = NULL;
-    Check(OpenFile(output_file_path, &output_file, "w"));
+    Check(OpenFile(output_file_path, &output_file, "wt"));
     Check(SortAndWriteLines(&output_file, &text, number_of_lines, false));
     Check(SortAndWriteLines(&output_file, &text, number_of_lines, true));
     Check(WriteBuffer(&output_file, buffer, size));
@@ -39,10 +39,12 @@ exit_code OpenFile(const char file_path[], FILE** file_pointer, const char* mode
     if (access(file_path, F_OK) == -1)
         return FILE_NOT_EXIST_ERROR;
 
-    else if (*mode == 'r' && access(file_path, R_OK) == -1)
+    else if ((strcmp(mode, "rt") || strcmp(mode, "rb"))
+             && access(file_path, R_OK) == -1)
         return FILE_READING_ERROR;
     
-    else if (*mode == 'w' && access(file_path, W_OK) == -1)
+    else if ((strcmp(mode, "wt") || strcmp(mode, "wb"))
+             && access(file_path, W_OK) == -1)
         return FILE_WRITTING_ERROR;
     
     else if (!(*file_pointer = fopen(file_path, mode)))
