@@ -285,6 +285,12 @@ void Check(exit_code code) {
         case ALL_OK:
             break;
             
+        case FILE_NOT_EXIST_ERROR:
+            fprintf(stderr, "File Doesn't Exist. "
+                    "Termination of the program.\n");
+            exit(code);
+            break;
+            
         case FILE_OPENING_ERROR:
             fprintf(stderr, "File Opening Error. "
                     "Termination of the program.\n");
