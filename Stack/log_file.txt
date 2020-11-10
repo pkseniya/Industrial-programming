@@ -1,0 +1,503 @@
+STACK 2020
+
+--------------------------------------------------
+TEST 0
+ALL OK
+--------------------------------------------------
+
+Function main on line 36 in function StackConstruct
+stack name: &stk1
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     0
+	capacity: 4
+	empty: true
+
+	stack hash: 3292070557337964575
+	data hash: 3236090077
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 2989 (POISON)
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 39 in function StackTop
+stack name: &stk1
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     0
+	capacity: 4
+	empty: true
+
+	stack hash: 3292070557337964575
+	data hash: 3236090077
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 2989 (POISON)
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 39 in function StackPop
+stack name: &stk1
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     0
+	capacity: 4
+	empty: true
+
+	stack hash: 3292070557337964575
+	data hash: 3236090077
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 2989 (POISON)
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 44 in function StackPush
+stack name: &stk1
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     0
+	capacity: 4
+	empty: false
+
+	stack hash: 3292070571063316931
+	data hash: 0
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 10
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 45 in function StackResize
+stack name: &stk1
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     0
+	capacity: 4
+	empty: false
+
+	stack hash: 3292070571063316931
+	data hash: 0
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 10
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 45 in function StackPush
+stack name: &stk1
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     1
+	capacity: 4
+	empty: false
+
+	stack hash: 3292074616900009284
+	data hash: 797628118
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 10
+
+		[1] 110
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 49 in function StackConstruct
+stack name: &stk3
+
+Stack (ok) [0x7ffeefbff3f0] {
+
+	size:     0
+	capacity: 4
+	empty: true
+
+	stack hash: 13082942970993562032
+	data hash: 3236090077
+
+	stack canary: 12947848656057342
+
+	{
+
+		[0] 2989 (POISON)
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 50 in function StackConstruct
+stack name: &stk2
+
+Stack (ok) [0x7ffeefbff430] {
+
+	size:     0
+	capacity: 4
+	empty: true
+
+	{
+
+		[0] 0.000000
+
+		[1] 0.000000
+
+		[2] 0.000000
+
+		[3] 0.000000
+
+	}
+
+}
+
+Function main on line 52 in function StackPush
+stack name: &stk2
+
+Stack (ok) [0x7ffeefbff430] {
+
+	size:     0
+	capacity: 4
+	empty: false
+
+	{
+
+		[0] 3.140000
+
+		[1] 0.000000
+
+		[2] 0.000000
+
+		[3] 0.000000
+
+	}
+
+}
+
+Function main on line 53 in function StackResize
+stack name: &stk1
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     1
+	capacity: 4
+	empty: false
+
+	stack hash: 3292074616900009284
+	data hash: 797628118
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 10
+
+		[1] 110
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 53 in function StackPush
+stack name: &stk1
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     2
+	capacity: 4
+	empty: false
+
+	stack hash: 3292062187225237709
+	data hash: 202643325162
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 10
+
+		[1] 110
+
+		[2] 1
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 54 in function StackPush
+stack name: &stk3
+
+Stack (ok) [0x7ffeefbff3f0] {
+
+	size:     0
+	capacity: 4
+	empty: false
+
+	stack hash: 13082942984651673708
+	data hash: 0
+
+	stack canary: 12947848656057342
+
+	{
+
+		[0] 9
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 55 in function StackResize
+stack name: &stk2
+
+Stack (ok) [0x7ffeefbff430] {
+
+	size:     0
+	capacity: 4
+	empty: false
+
+	{
+
+		[0] 3.140000
+
+		[1] 0.000000
+
+		[2] 0.000000
+
+		[3] 0.000000
+
+	}
+
+}
+
+Function main on line 55 in function StackPush
+stack name: &stk2
+
+Stack (ok) [0x7ffeefbff430] {
+
+	size:     1
+	capacity: 4
+	empty: false
+
+	{
+
+		[0] 3.140000
+
+		[1] 9.888000
+
+		[2] 0.000000
+
+		[3] 0.000000
+
+	}
+
+}
+
+Function main on line 58 in function StackTop
+stack name: &stk2
+
+Stack (ok) [0x7ffeefbff430] {
+
+	size:     1
+	capacity: 4
+	empty: false
+
+	{
+
+		[0] 3.140000
+
+		[1] 9.888000
+
+		[2] 0.000000
+
+		[3] 0.000000
+
+	}
+
+}
+
+Function main on line 58 in function StackResize
+stack name: &stk2
+
+Stack (ok) [0x7ffeefbff430] {
+
+	size:     0
+	capacity: 4
+	empty: false
+
+	{
+
+		[0] 3.140000
+
+		[1] 0.000000
+
+		[2] 0.000000
+
+		[3] 0.000000
+
+	}
+
+}
+
+Function main on line 58 in function StackPop
+stack name: &stk2
+
+Stack (ok) [0x7ffeefbff430] {
+
+	size:     0
+	capacity: 4
+	empty: false
+
+	{
+
+		[0] 3.140000
+
+		[1] 0.000000
+
+		[2] 0.000000
+
+		[3] 0.000000
+
+	}
+
+}
+
+Function main on line 63 in function StackResize
+stack name: &stk3
+
+Stack (ok) [0x7ffeefbff3f0] {
+
+	size:     0
+	capacity: 4
+	empty: false
+
+	stack hash: 13082942984651673708
+	data hash: 0
+
+	stack canary: 12947848656057342
+
+	{
+
+		[0] 9
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 63 in function StackPush
+stack name: &stk3
+
+Stack (ok) [0x7ffeefbff3f0] {
+
+	size:     1
+	capacity: 4
+	empty: false
+
+	stack hash: 13082947597449215211
+	data hash: 583659535
+
+	stack canary: 12947848656057342
+
+	{
+
+		[0] 9
+
+		[1] 144
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}

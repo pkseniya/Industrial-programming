@@ -1,0 +1,413 @@
+
+--------------------------------------------------
+TEST 1.1
+INVALID POINTER
+--------------------------------------------------
+
+Function main on line 115 in function StackPush
+stack name: __null
+
+
+--------------------------------------------------
+                    FATAL ERROR                   
+                 INVALID POINTER
+            TERMINATION OF THE PROGRAM            
+--------------------------------------------------
+
+
+--------------------------------------------------
+TEST: 1.2
+INVALID POINTER
+--------------------------------------------------
+
+Function main on line 120 in function StackConstruct
+stack name: &stk
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     0
+	capacity: 4
+	empty: true
+
+	stack hash: 3292070557337964575
+	data hash: 3236090077
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 2989 (POISON)
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 122 in function StackPush
+stack name: &stk
+
+
+--------------------------------------------------
+                    FATAL ERROR                   
+                 INVALID POINTER
+            TERMINATION OF THE PROGRAM            
+--------------------------------------------------
+
+
+--------------------------------------------------
+TEST 2
+INCORRECT CAPACITY
+--------------------------------------------------
+
+Function main on line 134 in function StackPush
+stack name: &stk
+
+
+--------------------------------------------------
+                    FATAL ERROR                   
+                INCORRECT CAPACITY
+            TERMINATION OF THE PROGRAM            
+--------------------------------------------------
+
+
+--------------------------------------------------
+TEST 3
+INCORRECT SIZE
+--------------------------------------------------
+
+Function main on line 146 in function StackConstruct
+stack name: &stk
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     0
+	capacity: 4
+	empty: true
+
+	stack hash: 3292070557337964575
+	data hash: 3236090077
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 2989 (POISON)
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 148 in function StackPush
+stack name: &stk
+
+
+--------------------------------------------------
+                    FATAL ERROR                   
+                  INCORRECT SIZE
+            TERMINATION OF THE PROGRAM            
+--------------------------------------------------
+
+
+--------------------------------------------------
+TEST 4
+STACK FIELDS CORRUPTED
+--------------------------------------------------
+
+Function main on line 160 in function StackConstruct
+stack name: &stk
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     0
+	capacity: 4
+	empty: true
+
+	stack hash: 3292070557337964575
+	data hash: 3236090077
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 2989 (POISON)
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 162 in function StackPush
+stack name: &stk
+
+
+--------------------------------------------------
+                    FATAL ERROR                   
+              STACK FIELDS CORRUPTED
+            TERMINATION OF THE PROGRAM            
+--------------------------------------------------
+
+
+--------------------------------------------------
+TEST 5
+STACK DATA CORRUPTED
+--------------------------------------------------
+
+Function main on line 174 in function StackConstruct
+stack name: &stk
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     0
+	capacity: 4
+	empty: true
+
+	stack hash: 3292070557337964575
+	data hash: 3236090077
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 2989 (POISON)
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 175 in function StackPush
+stack name: &stk
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     0
+	capacity: 4
+	empty: false
+
+	stack hash: 3292070571063316931
+	data hash: 0
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 5
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 178 in function StackTop
+stack name: &stk
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     0
+	capacity: 4
+	empty: false
+
+	stack hash: 3292070571063316931
+	data hash: 0
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 10
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 178 in function StackPop
+stack name: &stk
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     0
+	capacity: 4
+	empty: true
+
+	stack hash: 3292070557337964575
+	data hash: 3236090077
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 2989 (POISON)
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+--------------------------------------------------
+TEST 6
+DATA CANARY CORRUPTED
+--------------------------------------------------
+
+Function main on line 190 in function StackConstruct
+stack name: &stk
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     0
+	capacity: 4
+	empty: true
+
+	stack hash: 3292070557337964575
+	data hash: 3236090077
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 2989 (POISON)
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 193 in function StackTop
+stack name: &stk
+
+
+--------------------------------------------------
+                    FATAL ERROR                   
+              DATA CANARY CORRUPTED
+            TERMINATION OF THE PROGRAM            
+--------------------------------------------------
+
+
+--------------------------------------------------
+TEST 7
+STACK CANARY CORRUPTED
+--------------------------------------------------
+
+Function main on line 205 in function StackConstruct
+stack name: &stk
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     0
+	capacity: 4
+	empty: true
+
+	stack hash: 3292070557337964575
+	data hash: 3236090077
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 2989 (POISON)
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 207 in function StackPush
+stack name: &stk
+
+
+--------------------------------------------------
+                    FATAL ERROR                   
+              STACK CANARY CORRUPTED
+            TERMINATION OF THE PROGRAM            
+--------------------------------------------------
+
+
+--------------------------------------------------
+TEST 8
+STACK POISON CORRUPTED
+--------------------------------------------------
+
+Function main on line 221 in function StackConstruct
+stack name: &stk
+
+Stack (ok) [0x7ffeefbff458] {
+
+	size:     0
+	capacity: 4
+	empty: true
+
+	stack hash: 3292070557337964575
+	data hash: 3236090077
+
+	stack canary: 12947848656057566
+
+	{
+
+		[0] 2989 (POISON)
+
+		[1] 2989 (POISON)
+
+		[2] 2989 (POISON)
+
+		[3] 2989 (POISON)
+
+	}
+
+}
+
+Function main on line 223 in function StackPush
+stack name: &stk
+
+
+--------------------------------------------------
+                    FATAL ERROR                   
+              STACK POISON CORRUPTED
+            TERMINATION OF THE PROGRAM            
+--------------------------------------------------
+

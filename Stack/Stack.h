@@ -6,73 +6,24 @@
 #include <string.h>
 #include <assert.h>
 
+#ifdef Stack
+    #undef Stack
+    #undef StackConstruct
+    #undef StackPush
+    #undef StackPop
+    #undef StackTop
+#endif
+
 #ifdef OVERLOAD
     #undef OVERLOAD
 #endif
 
-#define NAME_JOIN(name1,name2)                name1 ## _ ## name2
-#define PARSE(name1,name2)                    NAME_JOIN(name1,name2)
-#define OVERLOAD(name)                        PARSE(name, StackElem)
-
-#define UPDATEHASH(stk) {                                                 \
-    stk->dataHash = OVERLOAD(HashStackData)(stk);                         \
-    stk->stackHash = OVERLOAD(HashStack)(stk);                            \
-}
-
-#define LINE __LINE__
-#define FUNC __FUNCTION__
-#define NAME(v) #v
-
-#ifdef STACK
-    #undef STACK
-#endif
-
-#ifdef CONSTRUCT
-    #undef CONSTRUCT
-#endif
-
-#ifdef PUSH
-    #undef PUSH
-#endif
-
-#ifdef POP
-    #undef POP
-#endif
-
-#ifdef TOP
-    #undef TOP
-#endif
-
-#ifdef DESTRUCT
-    #undef DESTRUCT
-#endif
-
-#define STACK(type)                           PARSE(Stack, type)
-#define CONSTRUCT(type, stk, capacity)        PARSE(StackConstruct, type) (stk, capacity, LINE, FUNC, NAME(stk))
-#define PUSH(type, stk, value)                PARSE(StackPush, type)      (stk, value, LINE, FUNC, NAME(stk))
-#define POP(type, stk, value)                 PARSE(StackPop, type)       (stk, value, LINE, FUNC, NAME(stk))
-#define TOP(type, stk, value)                 PARSE(StackTop, type)       (stk, value, LINE, FUNC, NAME(stk))
-#define DESTRUCT(type, stk)                   PARSE(StackDestruct, type)  (stk)
-
-#define ASSERT_OK(write) {                                                \
-    stack_state state = OVERLOAD(StackCheck)(stk);                        \
-                                                                          \
-    if (state) {                                                          \
-        StackDump(stk, state, line, func, name, __FUNCTION__);            \
-        if (state != INVALID_POINTER)                                     \
-            OVERLOAD(StackDestruct)(stk);                                 \
-        CloseFile(&file);                                                 \
-        exit(state);                                                      \
-    }                                                                     \
-                                                                          \
-    else if (write) {                                                     \
-        StackDump(stk, state, line, func, name, __FUNCTION__);            \
-    }                                                                     \
-}
-
 #ifndef StackElem
     #define StackElem                         int
+    #define TYPE_FORMAT                       "d"
 #endif
+
+#define OVERLOAD(name)                        PARSE(name, StackElem)
 
 #ifdef ON_DEBUG
     #undef ON_DEBUG
@@ -93,12 +44,42 @@
 #ifndef Stack_h
     #define Stack_h
 
+#include "Crc32.h"
+
 #define POISON                                0xBAD
 #define MIN_CAPACITY                          4
 #define MAX_CAPACITY                          512
 // In fact capacity can reach 1024
 
+#define NAME_JOIN(name1,name2)                name1 ## _ ## name2
+#define PARSE(name1,name2)                    NAME_JOIN(name1,name2)
+
+#define LINE __LINE__
+#define FUNC __FUNCTION__
+#define NAME(v) #v
+
+#define ASSERT_OK(write) {                                                \
+    stack_state state = StackCheck(stk);                                  \
+                                                                          \
+    if (state) {                                                          \
+        StackDump(stk, state, line, func, name, __FUNCTION__);            \
+        if (state != INVALID_POINTER)                                     \
+            StackDestruct(stk);                                           \
+        CloseFile(&file);                                                 \
+        exit(state);                                                      \
+    }                                                                     \
+                                                                          \
+    else if (write) {                                                     \
+        StackDump(stk, state, line, func, name, __FUNCTION__);            \
+    }                                                                     \
+}
+
 #define REHASH(pointer, crc) xcrc32((const size_t *) pointer, 1, crc);
+
+#define UPDATEHASH(stk) {                                                 \
+    stk->dataHash = HashStackData(stk);                                   \
+    stk->stackHash = HashStack(stk);                                      \
+}
 
 /**
  Stack states
@@ -110,6 +91,7 @@ typedef enum {
     STACK_FULL,
     INVALID_POINTER,
     NO_ALLOCATED_MEMORY,
+    INCORRECT_CAPACITY,
     INCORRECT_SIZE,
     STACK_FIELDS_CORRUPTED,
     STACK_DATA_CORRUPTED,
@@ -121,8 +103,6 @@ typedef enum {
 typedef size_t StackCanary;
 
 typedef size_t StackHash;
-
-#include "Crc32.h"
 
 /**
  Writes test description to the file
@@ -170,11 +150,8 @@ StackHash xcrc32 (const size_t *buf, size_t len, StackHash init) {
         crc = (crc << 8) ^ crc32_table[((crc >> 24) ^ *buf) & 255];
         buf++;
     }
-    
     return crc;
 }
-
-//
 
 #endif //Stack_h
 
@@ -207,7 +184,7 @@ typedef struct {
  @return         Stack state
 */
 
-stack_state OVERLOAD(StackCheck) (const OVERLOAD(Stack)* stk);
+stack_state StackCheck (const OVERLOAD(Stack)* stk);
 
 /**
  Writes stack state and stack contents if stack is ok to the log-file
@@ -220,7 +197,7 @@ stack_state OVERLOAD(StackCheck) (const OVERLOAD(Stack)* stk);
  @param[in]      func_name  Name of stack inteaction function
 */
 
-void StackDump (const OVERLOAD(Stack)* stk, stack_state state, int line, const char* func, const char name[20], const char func_name[100]);
+void StackDump (const OVERLOAD(Stack)* stk, stack_state state, int line, const char* func, const char* name, const char* func_name);
 
 /**
  Resizes stack capacity if nessesary
@@ -233,7 +210,7 @@ void StackDump (const OVERLOAD(Stack)* stk, stack_state state, int line, const c
  @return         Stack state
 */
 
-stack_state OVERLOAD(StackResize) (OVERLOAD(Stack)* stk, int line, const char func[100], const char name[20]);
+stack_state StackResize (OVERLOAD(Stack)* stk, int line, const char* func, const char* name);
 
 /**
  Constructs stack of given capacity
@@ -245,7 +222,7 @@ stack_state OVERLOAD(StackResize) (OVERLOAD(Stack)* stk, int line, const char fu
  @param[in]      name             Name of the stack
 */
 
-void OVERLOAD(StackConstruct) (OVERLOAD(Stack)* stk, size_t capacity, int line, const char func[100], const char name[20]);
+stack_state StackConstruct (OVERLOAD(Stack)* stk, size_t capacity, int line, const char* func, const char* name);
 
 /**
  Pushes given value to the stack
@@ -259,7 +236,7 @@ void OVERLOAD(StackConstruct) (OVERLOAD(Stack)* stk, size_t capacity, int line, 
  @return         Stack state
 */
 
-stack_state OVERLOAD(StackPush) (OVERLOAD(Stack)* stk, StackElem value, int line, const char func[100], const char name[20]);
+stack_state StackPush (OVERLOAD(Stack)* stk, StackElem value, int line, const char* func, const char* name);
 
 /**
  Writes the value at the top of the stack to a variable
@@ -270,10 +247,10 @@ stack_state OVERLOAD(StackPush) (OVERLOAD(Stack)* stk, StackElem value, int line
  @param[in]      func             Name of the main function
  @param[in]      name             Name of the stack
  
- @return
+ @return d
 */
 
-stack_state OVERLOAD(StackTop) (OVERLOAD(Stack)* stk, StackElem* value, int line, const char func[100], const char name[20]);
+stack_state StackTop (OVERLOAD(Stack)* stk, StackElem* value, int line, const char* func, const char* name);
 
 /**
  Writes the value at the top of the stack to a variable and delites it from the stack
@@ -284,10 +261,10 @@ stack_state OVERLOAD(StackTop) (OVERLOAD(Stack)* stk, StackElem* value, int line
  @param[in]      func             Name of the main function
  @param[in]      name             Name of the stack
  
- @return
+ @return d
 */
 
-stack_state OVERLOAD(StackPop) (OVERLOAD(Stack)* stk, StackElem* value, int line, const char func[100], const char name[20]);
+stack_state StackPop (OVERLOAD(Stack)* stk, StackElem* value, int line, const char* func, const char* name);
 
 /**
  Destructs the stack
@@ -295,7 +272,24 @@ stack_state OVERLOAD(StackPop) (OVERLOAD(Stack)* stk, StackElem* value, int line
  @param[in,out]  stk               Pointer to the stack
  */
 
-void OVERLOAD(StackDestruct) (OVERLOAD(Stack)* stk);
+void StackDestruct (OVERLOAD(Stack)* stk);
+
+/**
+ Dumps stack elements
+ 
+ @param[in]      stk               Pointer to the stack
+*/
+
+void PrintElems (const OVERLOAD(Stack)* stk);
+
+/**
+ Prints an stack items according to theirs type
+ 
+ @param[in]      elem             Pointer to the stack elem
+ @param[in]      is_poison  If we use poison
+*/
+
+void PrintStackElem (const StackElem* elem, bool is_poison);
 
 ON_DEBUG(
 
@@ -307,7 +301,7 @@ ON_DEBUG(
          @return         Canary value
         */
 
-        StackCanary OVERLOAD(Canary) (const OVERLOAD(Stack)* stk);
+        StackCanary Canary (const OVERLOAD(Stack)* stk);
          
         /**
          Calculates the hash sum using stack fields
@@ -317,7 +311,7 @@ ON_DEBUG(
          @return         Hash sum
         */
 
-        StackHash OVERLOAD(HashStack) (const OVERLOAD(Stack)* stk);
+        StackHash HashStack (const OVERLOAD(Stack)* stk);
            
         /**
          Calculates the hash sum using stack data
@@ -327,7 +321,7 @@ ON_DEBUG(
          @return         Hash sum
         */
                  
-        StackHash OVERLOAD(HashStackData) (const OVERLOAD(Stack)* stk);
+        StackHash HashStackData (const OVERLOAD(Stack)* stk);
          
         /**
          Finds the beginning of a block of memory with stack contents
@@ -360,31 +354,17 @@ ON_DEBUG(
         bool poison_ok(const OVERLOAD(Stack)* stk);
 )
 
-/**
- Dumps stack elements
- 
- @param[in]      stk               Pointer to the stack
-*/
-
-void PrintElems (const OVERLOAD(Stack)* stk);
-
-/**
- Prints an stack items according to theirs type
- 
- @param[in]      elem             Pointer to the stack elem
- @param[in]      is_poison  If we use poison
-*/
-
-void PrintStackElem (const StackElem* elem, bool is_poison);
-
 // Function defenitions
 
-stack_state OVERLOAD(StackCheck) (const OVERLOAD(Stack)* stk) {
+stack_state StackCheck (const OVERLOAD(Stack)* stk) {
     
-    ON_DEBUG(StackCanary canary = OVERLOAD(Canary) (stk);)
+    ON_DEBUG(StackCanary canary = Canary (stk);)
     
     if (!stk)
         return INVALID_POINTER;
+
+    else if (stk->capacity > MAX_CAPACITY || stk->capacity < MIN_CAPACITY)
+        return INCORRECT_CAPACITY;
     
     else if (!stk->data)
         return INVALID_POINTER;
@@ -392,25 +372,24 @@ stack_state OVERLOAD(StackCheck) (const OVERLOAD(Stack)* stk) {
     else if (!stk->memory_allocated)
         return NO_ALLOCATED_MEMORY;
     
-    else if (stk->size >= stk->capacity                  ||
-            (stk->empty && stk->size > 0))
-        
+    else if (stk->size >= stk->capacity || (stk->empty && stk->size > 0)) {
         return INCORRECT_SIZE;
+    }
     
     ON_DEBUG(
-             else if (stk->stackHash != OVERLOAD(HashStack) (stk))
+             else if (stk->stackCanaryFront != canary ||
+                      stk->stackCanaryBack  != canary)
+                return STACK_CANARY_CORRUPTED;
+             
+             else if (stk->stackHash != HashStack (stk))
                 return STACK_FIELDS_CORRUPTED;
                 
-             else if (stk->dataHash != OVERLOAD(HashStackData) (stk))
+             else if (stk->dataHash != HashStackData (stk))
                 return STACK_DATA_CORRUPTED;
              
              else if (*buffer_end(stk) != canary ||
                       *((StackCanary *) stk->data) != canary)
                 return DATA_CANARY_CORRUPTED;
-             
-             else if (stk->stackCanaryFront != canary    ||
-                      stk->stackCanaryBack  != canary)
-                return STACK_CANARY_CORRUPTED;
 
              else if (!poison_ok(stk))
                 return STACK_POISON_CORRUPTED;
@@ -421,15 +400,13 @@ stack_state OVERLOAD(StackCheck) (const OVERLOAD(Stack)* stk) {
 }
 
 void StackDump (const OVERLOAD(Stack)* stk, stack_state state, int line, const char* func,
-                const char name[20], const char func_name[100]) {
+                const char* name, const char* func_name) {
     
     fprintf(file, "\nFunction %s on line %d in function %s\nstack name: %s\n\n",
             func, line, func_name, name);
     
     switch (state) {
-            
         case STACK_OK:
-            
             fprintf(file, "Stack (ok) [%p] {\n\n\tsize:     %lu",
                     stk, stk->size);
             fprintf(file, "\n\tcapacity: %lu\n\tempty: %s\n",
@@ -447,57 +424,51 @@ void StackDump (const OVERLOAD(Stack)* stk, stack_state state, int line, const c
             break;
             
         case INVALID_POINTER:
-            
             PrintError("INVALID POINTER");
             break;
             
         case NO_ALLOCATED_MEMORY:
-            
             PrintError("NO ALLOCATED MEMORY");
+            break;
+        
+        case INCORRECT_CAPACITY:
+            PrintError("INCORRECT CAPACITY");
             break;
             
         case INCORRECT_SIZE:
-            
             PrintError("INCORRECT SIZE");
             break;
         
         case STACK_FIELDS_CORRUPTED:
-                
             PrintError("STACK FIELDS CORRUPTED");
             break;
                 
         case STACK_DATA_CORRUPTED:
-                
             PrintError("STACK DATA CORRUPTED");
             break;
             
         case DATA_CANARY_CORRUPTED:
-            
             PrintError("DATA CANARY CORRUPTED");
             break;
             
         case STACK_CANARY_CORRUPTED:
-            
             PrintError("STACK CANARY CORRUPTED");
             break;
             
         case STACK_POISON_CORRUPTED:
-            
             PrintError("STACK POISON CORRUPTED");
             break;
             
         default:
-            
             PrintError("UNEXPECTED ERROR");
             break;
     }
     
     fprintf(file, "\n");
-    
     return;
 }
 
-stack_state OVERLOAD(StackResize) (OVERLOAD(Stack)* stk, int line, const char func[100], const char name[20]) {
+stack_state StackResize (OVERLOAD(Stack)* stk, int line, const char* func, const char* name) {
     ASSERT_OK(false)
     
     size_t capacity = stk->capacity;
@@ -506,23 +477,24 @@ stack_state OVERLOAD(StackResize) (OVERLOAD(Stack)* stk, int line, const char fu
     size_t lower_bound = capacity / 4;
     
     if (stk->empty)
-        
         return STACK_OK;
     
-    else if (capacity > MAX_CAPACITY)
-        
+    else if ((capacity >= MAX_CAPACITY) && (stk->size == stk->capacity - 1))
         return STACK_FULL;
     
+    else if (capacity >= MAX_CAPACITY)
+        return STACK_OK;
+    
     else if ((lower_bound < stk->size) && (stk->size < upper_bound))
-        
         return STACK_OK;
     
     else if (stk->size >= upper_bound) {
-        
-        stk->capacity = capacity * 2;
+        stk->capacity = (capacity * 2 > MAX_CAPACITY) ? MAX_CAPACITY : capacity * 2;
         
         OFF_DEBUG(
                   stk->data = (StackElem *) realloc(stk->data, stk->capacity * sizeof(StackElem));
+                  if (!stk->data)
+                      return INVALID_POINTER;
                   
                   for (size_t i = stk->size + 1; i < capacity * 2; i++)
                       stk->data[i] = 0;
@@ -530,12 +502,16 @@ stack_state OVERLOAD(StackResize) (OVERLOAD(Stack)* stk, int line, const char fu
         
         ON_DEBUG (
                  stk->data = (StackElem *) realloc(stk->data, stk->capacity * sizeof(StackElem) + sizeof(StackCanary) * 2);
+                  
+                  if (!stk->data)
+                    return INVALID_POINTER;
+                  
                  StackElem* pointer = buffer_start(stk);
                   
                  for (size_t i = stk->size + 1; i < capacity * 2; i++)
                      pointer[i] = POISON;
                  
-                 *buffer_end(stk) = OVERLOAD(Canary)(stk);
+                 *buffer_end(stk) = Canary(stk);
         )
     }
     
@@ -544,6 +520,9 @@ stack_state OVERLOAD(StackResize) (OVERLOAD(Stack)* stk, int line, const char fu
         OFF_DEBUG(
                   stk->capacity = stk->capacity / 2;
                   stk->data = (StackElem *) realloc(stk->data, stk->capacity * sizeof(StackElem));
+                  
+                  if (!stk->data)
+                      return INVALID_POINTER;
         )
         
         ON_DEBUG(
@@ -556,33 +535,48 @@ stack_state OVERLOAD(StackResize) (OVERLOAD(Stack)* stk, int line, const char fu
                  
                  stk->data = (StackElem *) realloc(stk->data, stk->capacity * sizeof(StackElem) + sizeof(StackCanary)* 2);
                  
-                 *buffer_end(stk) = OVERLOAD(Canary)(stk);
+                 if (!stk->data)
+                     return INVALID_POINTER;
+                 
+                 *buffer_end(stk) = Canary(stk);
         )
     }
     
     ON_DEBUG(UPDATEHASH(stk))
-    ASSERT_OK(true)
     
+    ASSERT_OK(true)
     return STACK_OK;
 }
 
-void OVERLOAD(StackConstruct) (OVERLOAD(Stack)* stk, size_t capacity, int line, const char func[100], const char name[20]) {
+stack_state StackConstruct (OVERLOAD(Stack)* stk, size_t capacity, int line, const char* func, const char* name) {
     assert(stk);
     
-    stk->size = 0;
-    stk->capacity =  capacity > MAX_CAPACITY ? MAX_CAPACITY :
-                    (capacity < MIN_CAPACITY ? MIN_CAPACITY :
-                     capacity);
-
-    stk->empty = true;
-    stk->memory_allocated = true;
+    if (capacity > MAX_CAPACITY || capacity < MIN_CAPACITY)
+        return INCORRECT_CAPACITY;
     
-    OFF_DEBUG(stk->data = (StackElem *) calloc(stk->capacity, sizeof(StackElem));)
+    stk->size = 0;
+    stk->capacity =  capacity;
+    stk->empty = true;
+    stk->memory_allocated = false;
+    
+    OFF_DEBUG(
+              stk->data = (StackElem *) calloc(stk->capacity, sizeof(StackElem));
+              
+              if (!stk->data)
+                  return INVALID_POINTER;
+              else
+                  stk->memory_allocated = true;
+              )
 
     ON_DEBUG(
              stk->data = (StackElem *) malloc(stk->capacity * sizeof(stk->data[0]) + 2 * sizeof(StackCanary));
              
-             StackCanary canary = OVERLOAD(Canary)(stk);
+             if (!stk->data)
+                 return INVALID_POINTER;
+             else
+                 stk->memory_allocated = true;
+             
+             StackCanary canary = Canary(stk);
              stk->stackCanaryFront = canary;
              stk->stackCanaryBack = canary;
              
@@ -599,65 +593,61 @@ void OVERLOAD(StackConstruct) (OVERLOAD(Stack)* stk, size_t capacity, int line, 
              
              stk->stackHash = 0LU;
              stk->dataHash = 0LU;
-             
+
              UPDATEHASH(stk);
     )
 
     ASSERT_OK(true)
-    
-    return;
-}
-
-stack_state OVERLOAD(StackPush) (OVERLOAD(Stack)* stk, StackElem value, int line, const char func[100], const char name[20]) {
-    ASSERT_OK(false)
-    
-    stack_state not_resized = OVERLOAD (StackResize) (stk, line, func, name);
-    
-    if (not_resized)
-        return not_resized;
-    
-    if (stk->empty)
-        stk->empty = false;
-    
-    else
-        stk->size++;
-    
-    OFF_DEBUG(stk->data[stk->size] = value;)
-    
-    ON_DEBUG (*(buffer_start(stk) + stk->size) = value;)
-    
-    ON_DEBUG (UPDATEHASH(stk);)
-    
-    ASSERT_OK(true)
-    
     return STACK_OK;
 }
 
-stack_state OVERLOAD(StackTop) (OVERLOAD(Stack)* stk, StackElem* value, int line, const char func[100], const char name[20]) {
+stack_state StackPush (OVERLOAD(Stack)* stk, StackElem value, int line, const char* func, const char* name) {
     ASSERT_OK(false)
+    
+    stack_state state = StackResize(stk, line, func, name);
+    
+    if (!state) {
+        if (stk->empty)
+            stk->empty = false;
+        else
+            stk->size++;
+        
+        OFF_DEBUG(stk->data[stk->size] = value;)
+        
+        ON_DEBUG (
+                  buffer_start(stk)[stk->size] = value;
+                  UPDATEHASH(stk);
+                  )
+    }
+    
+    ASSERT_OK(true)
+    return state;
+}
+
+stack_state StackTop(OVERLOAD(Stack)* stk, StackElem* value, int line, const char* func, const char* name) {
+    ASSERT_OK(true)
     
     if (!stk->empty) {
         
         OFF_DEBUG(*value = stk->data[stk->size];)
 
-        ON_DEBUG (*value = *(buffer_start(stk) + stk->size);)
+        ON_DEBUG (*value = buffer_start(stk)[stk->size];)
         
         return STACK_OK;
     }
-    
     else
         return STACK_EMPTY;
 }
 
-stack_state OVERLOAD(StackPop) (OVERLOAD(Stack)* stk, StackElem* value, int line, const char func[100], const char name[20]) {
+stack_state StackPop (OVERLOAD(Stack)* stk, StackElem* value, int line, const char* func, const char* name) {
 
-    stack_state error = OVERLOAD(StackTop) (stk, value, line, func, name);
+    stack_state error = StackTop(stk, value, line, func, name);
     
     if (!error) {
         
         OFF_DEBUG(stk->data[stk->size] = 0;)
         
-        ON_DEBUG (*(buffer_start(stk) + stk->size) = POISON;)
+        ON_DEBUG (buffer_start(stk)[stk->size] = POISON;)
         
         if (stk->size == 0)
             stk->empty = true;
@@ -667,13 +657,12 @@ stack_state OVERLOAD(StackPop) (OVERLOAD(Stack)* stk, StackElem* value, int line
     
     ON_DEBUG (UPDATEHASH(stk);)
     
-    OVERLOAD (StackResize) (stk, line, func, name);
+    StackResize(stk, line, func, name);
     ASSERT_OK(true)
-    
     return error;
 }
 
-void OVERLOAD(StackDestruct) (OVERLOAD(Stack)* stk) {
+void StackDestruct (OVERLOAD(Stack)* stk) {
     
     OFF_DEBUG(size_t size = stk->size;)
     
@@ -703,11 +692,11 @@ void OVERLOAD(StackDestruct) (OVERLOAD(Stack)* stk) {
 }
 
 ON_DEBUG(
-         StackCanary OVERLOAD(Canary) (const OVERLOAD(Stack)* stk) {
-            return (0x2DEC0DEBADC0DE) | ((StackCanary) stk);
+         StackCanary Canary (const OVERLOAD(Stack)* stk) {
+            return 0x2DEC0DEBADC0DE | (StackCanary) stk;
          }
 
-         StackHash OVERLOAD(HashStack) (const OVERLOAD(Stack)* stk_pointer) {
+         StackHash HashStack (const OVERLOAD(Stack)* stk_pointer) {
             
             StackHash crc = xcrc32(0, 0, 0);
     
@@ -720,18 +709,16 @@ ON_DEBUG(
             return crc;
          }
 
-         StackHash OVERLOAD(HashStackData) (const OVERLOAD(Stack)* stk) {
+         StackHash HashStackData (const OVERLOAD(Stack)* stk) {
             
             StackHash crc = xcrc32(0, 0, 0);
             
             if (!stk->empty) {
-                for (size_t i = 0; i < stk->capacity; i++)
+                for (size_t i = 0; i < stk->size; i++)
                     crc = REHASH(buffer_start(stk) + i, crc);
             }
-    
-            else {
+            else
                 crc = REHASH(buffer_start(stk), crc);
-            }
     
             return crc;
         }
@@ -787,57 +774,18 @@ void PrintElems(const OVERLOAD(Stack)* stk) {
 
 void PrintStackElem (const StackElem* elem, bool is_poison) {
 
-    // Short
-    {
-        if (sizeof(StackElem) == 2) {
-            StackElem test = -1;
-            int16_t norm = -1;
-            
-            if (test == norm)
-                fprintf(file, "%hi", *elem);
-            
-            else
-                fprintf(file, "%hu", *elem);
-        }
-    }
-        
-    // Int
-    {
-        if (sizeof(StackElem) == 4) {
-            StackElem test = -1;
-            int32_t norm = -1;
-        
-            if (test == norm)
-                fprintf(file, "%d", *elem);
-        
-            else
-                fprintf(file, "%u", *elem);
-        }
-    }
-        
-    // Long long or double
-    {
-        if (sizeof(StackElem) == 8) {
-            StackElem test_long_long = -1;
-            StackElem test_double = 3.14;
-            int64_t norm_long_long = -1;
-            double norm_double = 3.14;
-        
-            if (test_double == norm_double)
-                fprintf(file, "%f", *elem);
-        
-            else if (test_long_long == norm_long_long)
-                fprintf(file, "%lld", *elem);
-            
-            else
-                fprintf(file, "%llu", *elem);
-        }
-    }
+    fprintf(file, "%" TYPE_FORMAT, *elem);
       
     if (is_poison)
         fprintf(file, " (POISON)");
     
     fprintf(file, "\n");
-    
     return;
 }
+
+#define Stack(type)                         PARSE          (Stack, type)
+
+#define StackConstruct(stk, capacity)       StackConstruct (stk, capacity, LINE, FUNC, NAME(stk))
+#define StackPush(stk, value)               StackPush      (stk, value, LINE, FUNC, NAME(stk))
+#define StackPop(stk, value)                StackPop       (stk, value, LINE, FUNC, NAME(stk))
+#define StackTop(stk, value)                StackTop       (stk, value, LINE, FUNC, NAME(stk))
